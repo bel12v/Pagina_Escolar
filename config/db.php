@@ -2,7 +2,7 @@
 $host = 'localhost';
 $dbname = 'pagina_escolar';
 $user = 'root';
-$pass = '';
+$pass = 'root';
 
 try { 
     // 1. Creamos la conexión PDO

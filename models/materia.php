@@ -43,15 +43,24 @@ class Materia {
     }
 
         // Actualizar
+    // Transacción local de MySQL: si algo falla, rollBack deja la materia como estaba.
     public function actualizar($id, $datos) {
-        $query = "UPDATE materias SET nombre = :nombre, clave = :clave, creditos = :creditos WHERE id = :id";
-        $stmt = $this->conn->prepare($query);
-        return $stmt->execute([
-            ':nombre' => $datos['nombre'],
-            ':clave' => $datos['clave'],
-            ':creditos' => $datos['creditos'],
-            ':id' => $id
-        ]);
+        try {
+            $this->conn->beginTransaction();
+            $query = "UPDATE materias SET nombre = :nombre, clave = :clave, creditos = :creditos WHERE id = :id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([
+                ':nombre' => $datos['nombre'],
+                ':clave' => $datos['clave'],
+                ':creditos' => $datos['creditos'],
+                ':id' => $id
+            ]);
+            $this->conn->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->conn->rollBack();
+            return false;
+        }
     }
 
     // Eliminar
